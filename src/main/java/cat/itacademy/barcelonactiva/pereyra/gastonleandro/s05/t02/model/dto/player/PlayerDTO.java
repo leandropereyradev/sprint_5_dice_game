@@ -9,9 +9,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class PlayerDTO {
     private Long id;
-    private String email;
-    private String password;
     private String nickName;
+    private String password;
     private Date registrationDate;
 
     private double winRate;

@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
@@ -19,11 +20,12 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public PlayerDTO addPlayer(PlayerDTO playerDTO) {
-        PlayerEntity player = new PlayerEntity();
+        if (playerRepository.findByNickName(playerDTO.getNickName()).isPresent())
+            throw new ServiceException("'" + playerDTO.getNickName() + "' already exists");
 
-        player.setEmail(playerDTO.getEmail());
-        player.setPassword(playerDTO.getPassword());
+        PlayerEntity player = new PlayerEntity();
         player.setNickName(playerDTO.getNickName().isEmpty() ? "Anonymous" : playerDTO.getNickName());
+        player.setPassword(playerDTO.getPassword());
         player.setRegistrationDate(new Date());
 
         playerRepository.save(player);
@@ -33,11 +35,11 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
-        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("User not found"));
 
-        player.setEmail(playerDTO.getEmail());
-        player.setPassword(playerDTO.getPassword());
-        player.setNickName(playerDTO.getNickName());
+        if (playerDTO.getNickName() != null) player.setNickName(playerDTO.getNickName());
+
+        if (playerDTO.getPassword() != null) player.setPassword(playerDTO.getPassword());
 
         playerRepository.save(player);
 
@@ -52,13 +54,14 @@ public class PlayerServiceImpl implements PlayerService {
             playerRepository.deleteById(id);
             return true;
 
-        } else return false;
+        } else throw new ServiceException("User not found");
     }
 
     @Override
     public PlayerDTO getPlayerById(Long id) {
-        Optional<PlayerEntity> playerEntity = playerRepository.findById(id);
-        return playerEntity.map(this::convertToDTO).orElse(null);
+        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("User not found"));
+
+        return convertToDTO(player);
     }
 
     @Override
@@ -66,14 +69,13 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    private PlayerDTO convertToDTO(PlayerEntity user) {
+    private PlayerDTO convertToDTO(PlayerEntity player) {
         PlayerDTO dto = new PlayerDTO();
 
-        dto.setId(user.getId());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setNickName(user.getNickName());
-        dto.setRegistrationDate(user.getRegistrationDate());
+        dto.setId(player.getId());
+        dto.setNickName(player.getNickName());
+        dto.setPassword(player.getPassword());
+        dto.setRegistrationDate(player.getRegistrationDate());
 
         return dto;
     }

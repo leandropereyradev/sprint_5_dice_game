@@ -44,10 +44,9 @@ public class PlayerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
-        Optional<PlayerDTO> player = Optional.ofNullable(playerService.getPlayerById(id));
+        PlayerDTO player = playerService.getPlayerById(id);
 
-        return player.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return ResponseEntity.ok(player);
     }
 
     @GetMapping
