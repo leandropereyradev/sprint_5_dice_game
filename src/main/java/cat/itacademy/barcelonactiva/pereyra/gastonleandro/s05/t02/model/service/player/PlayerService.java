@@ -16,4 +16,6 @@ public interface PlayerService {
     List<PlayerDTO> getAllPlayers();
 
     double getAverageWinRate();
+
+    PlayerDTO getPlayerWithLowestWinRate();
 }

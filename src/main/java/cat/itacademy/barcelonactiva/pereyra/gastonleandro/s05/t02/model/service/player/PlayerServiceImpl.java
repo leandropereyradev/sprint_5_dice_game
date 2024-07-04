@@ -9,6 +9,7 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.reposito
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
-        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("User not found"));
+        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
         if (playerDTO.getNickName() != null) player.setNickName(playerDTO.getNickName());
 
@@ -58,12 +59,12 @@ public class PlayerServiceImpl implements PlayerService {
             playerRepository.deleteById(id);
             return true;
 
-        } else throw new ServiceException("User not found");
+        } else throw new ServiceException("Player not found");
     }
 
     @Override
     public PlayerDTO getPlayerById(Long id) {
-        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("User not found"));
+        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
         return convertToDTO(player);
     }
@@ -82,6 +83,16 @@ public class PlayerServiceImpl implements PlayerService {
                 .sum();
 
         return players.isEmpty() ? 0 : totalWinRate / players.size();
+    }
+
+    @Override
+    public PlayerDTO getPlayerWithLowestWinRate() {
+        List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
+                .map(this::convertToDTO)
+                .min(Comparator.comparingDouble(PlayerDTO::getWinRate))
+                .orElseThrow(() -> new ServiceException("No players found"));
     }
 
     private PlayerDTO convertToDTO(PlayerEntity player) {
