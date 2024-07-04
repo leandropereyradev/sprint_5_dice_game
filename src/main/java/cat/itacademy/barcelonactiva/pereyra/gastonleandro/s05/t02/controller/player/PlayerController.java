@@ -55,5 +55,12 @@ public class PlayerController {
 
         return ResponseEntity.ok(players);
     }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<Double> getAverageWinRate() {
+        double averageWinRate = playerService.getAverageWinRate();
+
+        return ResponseEntity.ok(averageWinRate);
+    }
 }
 

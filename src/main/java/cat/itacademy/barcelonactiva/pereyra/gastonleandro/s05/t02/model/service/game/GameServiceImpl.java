@@ -3,7 +3,6 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.game.GameDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,6 @@ public class GameServiceImpl implements GameService {
 
     @Autowired
     private GameRepository gameRepository;
-
-    @Autowired
-    private PlayerRepository playerRepository;
 
     @Override
     public GameDTO rollDices(Long playerId) {

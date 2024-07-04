@@ -14,4 +14,6 @@ public interface PlayerService {
     PlayerDTO getPlayerById(Long id);
 
     List<PlayerDTO> getAllPlayers();
+
+    double getAverageWinRate();
 }
