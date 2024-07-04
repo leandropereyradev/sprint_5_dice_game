@@ -69,5 +69,12 @@ public class PlayerController {
 
         return ResponseEntity.ok(playerWithLowestWinRate);
     }
+
+    @GetMapping("/ranking/winner")
+    public ResponseEntity<PlayerDTO> getPlayerWithHighestWinRate() {
+        PlayerDTO playerWithHighestWinRate = playerService.getPlayerWithHighestWinRate();
+
+        return ResponseEntity.ok(playerWithHighestWinRate);
+    }
 }
 

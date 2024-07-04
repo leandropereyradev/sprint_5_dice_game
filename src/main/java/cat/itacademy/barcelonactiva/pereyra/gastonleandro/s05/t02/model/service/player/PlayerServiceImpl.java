@@ -95,6 +95,16 @@ public class PlayerServiceImpl implements PlayerService {
                 .orElseThrow(() -> new ServiceException("No players found"));
     }
 
+    @Override
+    public PlayerDTO getPlayerWithHighestWinRate() {
+        List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
+                .map(this::convertToDTO)
+                .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
+                .orElseThrow(() -> new ServiceException("No players found"));
+    }
+
     private PlayerDTO convertToDTO(PlayerEntity player) {
         PlayerDTO dto = new PlayerDTO();
 

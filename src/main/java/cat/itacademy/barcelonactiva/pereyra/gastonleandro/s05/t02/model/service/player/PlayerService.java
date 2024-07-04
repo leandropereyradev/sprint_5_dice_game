@@ -18,4 +18,6 @@ public interface PlayerService {
     double getAverageWinRate();
 
     PlayerDTO getPlayerWithLowestWinRate();
+
+    PlayerDTO getPlayerWithHighestWinRate();
 }
