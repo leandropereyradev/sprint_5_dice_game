@@ -46,7 +46,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public boolean deleteRollsByPlayer(Long playerId) {
-        return gameRepository.deleteByPlayerId(playerId);
+        Long deletedCount = gameRepository.deleteByPlayerId(playerId);
+        return deletedCount > 0;
     }
 
     private GameDTO convertToDTO(GameEntity gameEntity) {
