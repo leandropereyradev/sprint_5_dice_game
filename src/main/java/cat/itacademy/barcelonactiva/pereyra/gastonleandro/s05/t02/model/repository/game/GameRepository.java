@@ -2,7 +2,6 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.reposit
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 

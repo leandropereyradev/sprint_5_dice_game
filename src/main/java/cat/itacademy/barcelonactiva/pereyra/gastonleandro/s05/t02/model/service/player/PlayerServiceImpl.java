@@ -1,11 +1,9 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +19,7 @@ public class PlayerServiceImpl implements PlayerService {
     private PlayerRepository playerRepository;
 
     @Autowired
-    private GameRepository gameRepository;
+    private PlayerMapper playerMapper;
 
     @Override
     public PlayerDTO addPlayer(PlayerDTO playerDTO) {
@@ -35,7 +33,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         playerRepository.save(player);
 
-        return convertToDTO(player);
+        return playerMapper.convertToDTO(player);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         playerRepository.save(player);
 
-        return convertToDTO(player);
+        return playerMapper.convertToDTO(player);
     }
 
     @Override
@@ -66,12 +64,12 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDTO getPlayerById(Long id) {
         PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
-        return convertToDTO(player);
+        return playerMapper.convertToDTO(player);
     }
 
     @Override
     public List<PlayerDTO> getAllPlayers() {
-        return playerRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return playerRepository.findAll().stream().map(playerMapper::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -79,7 +77,7 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         double totalWinRate = players.stream()
-                .mapToDouble(this::calculateWinRate)
+                .mapToDouble(playerMapper::calculateWinRate)
                 .sum();
 
         return players.isEmpty() ? 0 : totalWinRate / players.size();
@@ -90,7 +88,7 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
-                .map(this::convertToDTO)
+                .map(playerMapper::convertToDTO)
                 .min(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new ServiceException("No players found"));
     }
@@ -100,34 +98,8 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
-                .map(this::convertToDTO)
+                .map(playerMapper::convertToDTO)
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new ServiceException("No players found"));
-    }
-
-    private PlayerDTO convertToDTO(PlayerEntity player) {
-        PlayerDTO dto = new PlayerDTO();
-
-        dto.setId(player.getId());
-        dto.setNickName(player.getNickName());
-        dto.setPassword(player.getPassword());
-        dto.setRegistrationDate(player.getRegistrationDate());
-
-        List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
-        long totalGames = games.size();
-        long totalWins = games.stream().filter(GameEntity::isHasWon).count();
-        double winRate = totalGames == 0 ? 0 : (double) totalWins / totalGames * 100;
-        dto.setWinRate(winRate);
-
-        return dto;
-    }
-
-    private double calculateWinRate(PlayerEntity player) {
-        List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
-
-        long totalGames = games.size();
-        long totalWins = games.stream().filter(GameEntity::isHasWon).count();
-
-        return totalGames == 0 ? 0 : (double) totalWins / totalGames * 100;
     }
 }

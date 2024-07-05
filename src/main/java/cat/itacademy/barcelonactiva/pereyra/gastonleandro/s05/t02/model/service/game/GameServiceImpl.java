@@ -16,6 +16,9 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private GameMapper gameMapper;
+
     @Override
     public GameDTO rollDices(Long playerId) {
         GameEntity game = new GameEntity();
@@ -29,14 +32,14 @@ public class GameServiceImpl implements GameService {
 
         gameRepository.save(game);
 
-        return convertToDTO(game);
+        return gameMapper.convertToDTO(game);
     }
 
     @Override
     public List<GameDTO> getRollsByPlayer(Long playerId) {
         return gameRepository.findByPlayerId(playerId)
                 .stream()
-                .map(this::convertToDTO)
+                .map(gameMapper::convertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -44,19 +47,5 @@ public class GameServiceImpl implements GameService {
     public boolean deleteRollsByPlayer(Long playerId) {
         Long deletedCount = gameRepository.deleteByPlayerId(playerId);
         return deletedCount > 0;
-    }
-
-    private GameDTO convertToDTO(GameEntity gameEntity) {
-        GameDTO dto = new GameDTO();
-
-        dto.setId(gameEntity.getId());
-        dto.setDice1(gameEntity.getDice1());
-        dto.setDice2(gameEntity.getDice2());
-        dto.setGameResult(gameEntity.getGameResult());
-        dto.setPlayerId(gameEntity.getPlayerId());
-        dto.setHasWon(gameEntity.isHasWon());
-        dto.setGameRollDate(gameEntity.getGameRollDate());
-
-        return dto;
     }
 }

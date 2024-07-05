@@ -15,6 +15,4 @@ public class GameDTO {
     private boolean hasWon;
     private int gameResult;
     private Date gameRollDate;
-
-    private double successRate;
 }
