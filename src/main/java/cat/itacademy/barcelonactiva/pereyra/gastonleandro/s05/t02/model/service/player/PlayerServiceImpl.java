@@ -6,6 +6,7 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.play
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -22,6 +23,7 @@ public class PlayerServiceImpl implements PlayerService {
     private PlayerMapper playerMapper;
 
     @Override
+    @Transactional
     public PlayerDTO addPlayer(PlayerDTO playerDTO) {
         if (playerRepository.findByNickName(playerDTO.getNickName()).isPresent())
             throw new ServiceException("'" + playerDTO.getNickName() + "' already exists");

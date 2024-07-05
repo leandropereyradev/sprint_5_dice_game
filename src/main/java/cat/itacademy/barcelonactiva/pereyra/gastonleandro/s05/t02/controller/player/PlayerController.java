@@ -6,28 +6,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/players")
 @Slf4j
+@Validated
 public class PlayerController {
 
     @Autowired
     private PlayerService playerService;
 
     @PostMapping
-    public ResponseEntity<PlayerDTO> addPlayer(@RequestBody PlayerDTO playerDTO) {
+    public ResponseEntity<PlayerDTO> addPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         PlayerDTO addedPlayer = playerService.addPlayer(playerDTO);
 
         return ResponseEntity.ok(addedPlayer);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @RequestBody PlayerDTO playerDTO) {
+    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO) {
         PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO);
 
         return ResponseEntity.ok(updatedPlayer);
@@ -77,4 +79,3 @@ public class PlayerController {
         return ResponseEntity.ok(playerWithHighestWinRate);
     }
 }
-

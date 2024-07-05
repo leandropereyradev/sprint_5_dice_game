@@ -21,18 +21,18 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameDTO rollDices(Long playerId) {
-        GameEntity game = new GameEntity();
+        GameEntity gameEntity = new GameEntity();
 
-        game.setPlayerId(playerId);
-        game.setDice1((int) (Math.random() * 6) + 1);
-        game.setDice2((int) (Math.random() * 6) + 1);
-        game.setGameResult(game.getDice1() + game.getDice2());
-        game.setHasWon(game.getGameResult() == 7);
-        game.setGameRollDate(new Date());
+        gameEntity.setPlayerId(playerId);
+        gameEntity.setDice1((int) (Math.random() * 6) + 1);
+        gameEntity.setDice2((int) (Math.random() * 6) + 1);
+        gameEntity.setGameResult(gameEntity.getDice1() + gameEntity.getDice2());
+        gameEntity.setHasWon(gameEntity.getGameResult() == 7);
+        gameEntity.setGameRollDate(new Date());
 
-        gameRepository.save(game);
+        gameRepository.save(gameEntity);
 
-        return gameMapper.convertToDTO(game);
+        return gameMapper.convertToDTO(gameEntity);
     }
 
     @Override
