@@ -3,8 +3,8 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +13,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "kshfglkhsl34hbDSFagdjksfSFDGrefDdggsfgsfgjj5kblkjflkg";
-    private static final long EXPIRATION_TIME_MS = 1000 * 60 * 60 * 24;
+    private static final String SECRET_KEY = "e8jX2F1mA6z5vY2nF8s9xJ5lA7gD2pL4";
+    private static final long EXPIRATION_TIME_MS = 86_400_000;
 
     public String getToken(UserDetails player) {
         return getToken(new HashMap<>(), player);
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails player) {
+        extraClaims.put("authorities", player.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -35,7 +40,7 @@ public class JwtService {
     }
 
     private Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = SECRET_KEY.getBytes();
 
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -47,7 +52,7 @@ public class JwtService {
     }
 
     public String getNickNameFromToken(String token) {
-        return getClaim(token, Claims :: getSubject);
+        return getClaim(token, Claims::getSubject);
     }
 
     private Claims getAllClaims(String token) {
@@ -66,11 +71,10 @@ public class JwtService {
     }
 
     private Date getExpiration(String token) {
-        return getClaim(token, Claims :: getExpiration);
+        return getClaim(token, Claims::getExpiration);
     }
 
     private boolean isTokenExpired(String token) {
         return getExpiration(token).before(new Date());
-
     }
 }

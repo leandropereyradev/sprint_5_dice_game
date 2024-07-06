@@ -48,7 +48,7 @@ public class PlayerEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return nickName;
     }
 
     @Override

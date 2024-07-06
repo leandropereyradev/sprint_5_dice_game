@@ -1,7 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.filters;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
-import ch.qos.logback.core.util.StringUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,9 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getTokenFromRequest(HttpServletRequest request) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer "))
             return authHeader.substring(7);
-        }
+
         return null;
     }
 }
