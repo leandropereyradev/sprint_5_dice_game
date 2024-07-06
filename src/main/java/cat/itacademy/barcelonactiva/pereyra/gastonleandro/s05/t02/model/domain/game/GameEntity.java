@@ -1,12 +1,18 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "game")
 public class GameEntity {
 

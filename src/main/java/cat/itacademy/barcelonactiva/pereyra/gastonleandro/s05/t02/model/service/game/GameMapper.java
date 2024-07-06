@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 public class GameMapper {
 
     GameDTO convertToDTO(GameEntity gameEntity) {
-        GameDTO dto = new GameDTO();
 
-        dto.setId(gameEntity.getId());
-        dto.setDice1(gameEntity.getDice1());
-        dto.setDice2(gameEntity.getDice2());
-        dto.setGameResult(gameEntity.getGameResult());
-        dto.setPlayerId(gameEntity.getPlayerId());
-        dto.setHasWon(gameEntity.isHasWon());
-        dto.setGameRollDate(gameEntity.getGameRollDate());
-
-        return dto;
+        return GameDTO
+                .builder()
+                .id(gameEntity.getId())
+                .dice1(gameEntity.getDice1())
+                .dice2(gameEntity.getDice2())
+                .gameResult(gameEntity.getGameResult())
+                .playerId(gameEntity.getPlayerId())
+                .hasWon(gameEntity.isHasWon())
+                .gameRollDate(gameEntity.getGameRollDate())
+                .build();
     }
 }

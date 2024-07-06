@@ -7,6 +7,7 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.play
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,25 @@ public class PlayerServiceImpl implements PlayerService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+
+    @Override
+    @PostConstruct
+    public void createAdminUserIfNotExists() {
+        boolean adminExists = playerRepository.findById(1L).isPresent();
+
+        if (!adminExists) {
+            PlayerEntity admin = PlayerEntity
+                    .builder()
+                    .id(1L)
+                    .nickName("admin")
+                    .password(passwordEncoder.encode("admin"))
+                    .role(Role.ADMIN)
+                    .registrationDate(new Date())
+                    .build();
+
+            playerRepository.save(admin);
+        }
+    }
 
     @Override
     @Transactional

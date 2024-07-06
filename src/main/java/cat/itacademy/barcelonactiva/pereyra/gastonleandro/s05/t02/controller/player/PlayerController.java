@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +25,14 @@ public class PlayerController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         AuthResponse authResponse = playerService.register(playerDTO);
+
         return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         AuthResponse authResponse = playerService.login(playerDTO);
+
         return ResponseEntity.ok(authResponse);
     }
 
@@ -43,7 +44,6 @@ public class PlayerController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         boolean isDeleted = playerService.deletePlayer(id);
 

@@ -15,30 +15,21 @@ public class PlayerMapper {
     private GameRepository gameRepository;
 
     PlayerDTO convertToDTO(PlayerEntity player) {
-        /*PlayerDTO dto = new PlayerDTO();
+        List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
 
-        dto.setId(player.getId());
-        dto.setNickName(player.getNickName());
-        dto.setPassword(player.getPassword());
-        dto.setRegistrationDate(player.getRegistrationDate());*/
+        long totalGames = games.size();
+        long totalWins = games.stream().filter(GameEntity::isHasWon).count();
+        double winRate = totalGames == 0 ? 0 : (double) totalWins / totalGames * 100;
 
-        PlayerDTO dto = PlayerDTO
+        return PlayerDTO
                 .builder()
                 .id(player.getId())
                 .nickName(player.getNickName())
                 .role(player.getRole())
                 .password(player.getPassword())
                 .registrationDate(player.getRegistrationDate())
+                .winRate(winRate)
                 .build();
-
-
-        List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
-        long totalGames = games.size();
-        long totalWins = games.stream().filter(GameEntity::isHasWon).count();
-        double winRate = totalGames == 0 ? 0 : (double) totalWins / totalGames * 100;
-        dto.setWinRate(winRate);
-
-        return dto;
     }
 
     double calculateWinRate(PlayerEntity player) {

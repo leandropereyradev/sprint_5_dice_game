@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -25,14 +24,16 @@ public class JwtService {
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails player) {
-        extraClaims.put("authorities", player.getAuthorities().stream()
+        String role = player.getAuthorities().stream()
+                .findFirst()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .orElse("");
 
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(player.getUsername())
+                .claim("nickname", player.getUsername())
+                .claim("password", player.getPassword())
+                .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
@@ -52,7 +53,7 @@ public class JwtService {
     }
 
     public String getNickNameFromToken(String token) {
-        return getClaim(token, Claims::getSubject);
+        return getClaim(token, claims -> claims.get("nickname", String.class));
     }
 
     private Claims getAllClaims(String token) {

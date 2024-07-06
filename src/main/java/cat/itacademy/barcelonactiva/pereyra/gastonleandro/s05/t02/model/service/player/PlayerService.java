@@ -6,6 +6,8 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.
 import java.util.List;
 
 public interface PlayerService {
+    void createAdminUserIfNotExists();
+
     AuthResponse register(PlayerDTO playerDTO);
 
     AuthResponse login(PlayerDTO playerDTO);

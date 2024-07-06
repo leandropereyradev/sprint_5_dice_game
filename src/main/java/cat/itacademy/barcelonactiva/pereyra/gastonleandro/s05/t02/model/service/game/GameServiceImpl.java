@@ -21,14 +21,19 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameDTO rollDices(Long playerId) {
-        GameEntity gameEntity = new GameEntity();
+        int dice1 = (int) (Math.random() * 6) + 1;
+        int dice2 = (int) (Math.random() * 6) + 1;
+        int result = dice1 + dice2;
 
-        gameEntity.setPlayerId(playerId);
-        gameEntity.setDice1((int) (Math.random() * 6) + 1);
-        gameEntity.setDice2((int) (Math.random() * 6) + 1);
-        gameEntity.setGameResult(gameEntity.getDice1() + gameEntity.getDice2());
-        gameEntity.setHasWon(gameEntity.getGameResult() == 7);
-        gameEntity.setGameRollDate(new Date());
+        GameEntity gameEntity = GameEntity
+                .builder()
+                .playerId(playerId)
+                .dice1(dice1)
+                .dice2(dice2)
+                .gameResult(dice1 + dice2)
+                .hasWon(result == 7)
+                .gameRollDate(new Date())
+                .build();
 
         gameRepository.save(gameEntity);
 
@@ -46,6 +51,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public boolean deleteRollsByPlayer(Long playerId) {
         Long deletedCount = gameRepository.deleteByPlayerId(playerId);
+
         return deletedCount > 0;
     }
 }
