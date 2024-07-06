@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,8 @@ public class PlayerDTO {
     @Size(min = 6, max = 30, message = "Password must be between 6 and 30 characters")
     private String password;
 
+
+    private Role role;
     private Date registrationDate;
     private double winRate;
 }

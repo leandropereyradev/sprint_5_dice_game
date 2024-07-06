@@ -1,6 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.player;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/players")
+@RequestMapping("/api/players")
 @Slf4j
 @Validated
 public class PlayerController {
@@ -21,11 +22,16 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
-    @PostMapping
-    public ResponseEntity<PlayerDTO> addPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
-        PlayerDTO addedPlayer = playerService.addPlayer(playerDTO);
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
+        AuthResponse authResponse = playerService.register(playerDTO);
+        return ResponseEntity.ok(authResponse);
+    }
 
-        return ResponseEntity.ok(addedPlayer);
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> loginPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
+        AuthResponse authResponse = playerService.login(playerDTO);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PutMapping("/{id}")
@@ -46,9 +52,9 @@ public class PlayerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
-        PlayerDTO player = playerService.getPlayerById(id);
+        PlayerDTO playerDTO = playerService.getPlayerById(id);
 
-        return ResponseEntity.ok(player);
+        return ResponseEntity.ok(playerDTO);
     }
 
     @GetMapping

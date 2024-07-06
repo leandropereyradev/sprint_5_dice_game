@@ -15,12 +15,22 @@ public class PlayerMapper {
     private GameRepository gameRepository;
 
     PlayerDTO convertToDTO(PlayerEntity player) {
-        PlayerDTO dto = new PlayerDTO();
+        /*PlayerDTO dto = new PlayerDTO();
 
         dto.setId(player.getId());
         dto.setNickName(player.getNickName());
         dto.setPassword(player.getPassword());
-        dto.setRegistrationDate(player.getRegistrationDate());
+        dto.setRegistrationDate(player.getRegistrationDate());*/
+
+        PlayerDTO dto = PlayerDTO
+                .builder()
+                .id(player.getId())
+                .nickName(player.getNickName())
+                .role(player.getRole())
+                .password(player.getPassword())
+                .registrationDate(player.getRegistrationDate())
+                .build();
+
 
         List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
         long totalGames = games.size();
