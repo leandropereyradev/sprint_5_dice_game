@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY = "e8jX2F1mA6z5vY2nF8s9xJ5lA7gD2pL4";
     private static final long EXPIRATION_TIME_MS = 86_400_000;
+
+    @Autowired
+    private InvalidTokenService invalidTokenService;
 
     public String getToken(UserDetails player) {
         return getToken(new HashMap<>(), player);
@@ -49,7 +53,7 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String nickName = getNickNameFromToken(token);
 
-        return (nickName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (nickName.equals(userDetails.getUsername()) && !isTokenExpired(token) && !invalidTokenService.isTokenInvalid(token));
     }
 
     public String getNickNameFromToken(String token) {
@@ -69,6 +73,13 @@ public class JwtService {
         final Claims claims = getAllClaims(token);
 
         return claimsResolver.apply(claims);
+    }
+
+    public String getExpiredToken() {
+        return Jwts.builder()
+                .setExpiration(new Date(0))
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     private Date getExpiration(String token) {

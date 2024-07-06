@@ -2,7 +2,9 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.pl
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.InvalidTokenService;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
+    @Autowired
+    private InvalidTokenService invalidTokenService;
+
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         AuthResponse authResponse = playerService.register(playerDTO);
@@ -34,6 +39,15 @@ public class PlayerController {
         AuthResponse authResponse = playerService.login(playerDTO);
 
         return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logoutPlayer(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+
+        invalidTokenService.invalidateToken(token);
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
