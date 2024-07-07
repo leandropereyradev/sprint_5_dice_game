@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -25,8 +28,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers("/api/players/register").permitAll()
-                                .requestMatchers("/api/players/login").permitAll()
+                                .requestMatchers(publicEndpoints()).permitAll()
+                                //.requestMatchers("/api/players/login").permitAll()
                                 .requestMatchers("/api/players/delete/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
@@ -39,4 +42,18 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+    private RequestMatcher publicEndpoints(){
+        return new OrRequestMatcher(
+                new AntPathRequestMatcher("/api/players/register"),
+                new AntPathRequestMatcher("/api/players/login"),
+                new AntPathRequestMatcher("/swagger"),
+                new AntPathRequestMatcher("/swagger/**"),
+                new AntPathRequestMatcher("/swagger-ui/**"),
+                new AntPathRequestMatcher("/swagger-resources/**"),
+                new AntPathRequestMatcher("/v3/api-docs/**"),
+                new AntPathRequestMatcher("/error")
+        );
+    }
+
 }

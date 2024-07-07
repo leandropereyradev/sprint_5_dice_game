@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/players/{id}/games")
+@RequestMapping("/api/players/{id}/games")
 @Slf4j
 public class GameController {
 
