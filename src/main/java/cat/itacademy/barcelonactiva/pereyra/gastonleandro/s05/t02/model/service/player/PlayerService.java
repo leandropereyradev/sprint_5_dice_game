@@ -21,7 +21,7 @@ public interface PlayerService {
 
     PlayerDTO getPlayerById(Long id, HttpServletRequest request);
 
-    List<PlayerDTO> getAllPlayers();
+    List<PlayerDTO> getAllPlayers(HttpServletRequest request);
 
     double getAverageWinRate();
 

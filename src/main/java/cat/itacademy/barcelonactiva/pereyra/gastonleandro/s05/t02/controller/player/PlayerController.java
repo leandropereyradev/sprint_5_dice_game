@@ -106,8 +106,8 @@ public class PlayerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Players retrieved successfully")
     })
-    public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
-        List<PlayerDTO> players = playerService.getAllPlayers();
+    public ResponseEntity<List<PlayerDTO>> getAllPlayers(HttpServletRequest request) {
+        List<PlayerDTO> players = playerService.getAllPlayers(request);
 
         return ResponseEntity.ok(players);
     }

@@ -145,8 +145,23 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public List<PlayerDTO> getAllPlayers() {
-        return playerRepository.findAll().stream().map(playerMapper::convertToDTO).collect(Collectors.toList());
+    public List<PlayerDTO> getAllPlayers(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String tokenEmail = jwtService.getEmailFromToken(token);
+
+        PlayerEntity tokenPlayer = playerRepository.findByEmail(tokenEmail)
+                .orElseThrow(() -> new ServiceException("Player not found"));
+
+        if (tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
+            return playerRepository.findAll().stream()
+                .map(playerMapper::convertToDTO)
+                .collect(Collectors.toList());
+
+        else return playerRepository.findAll().stream()
+                .filter(player -> !player.getId().equals(1L))
+                .map(playerMapper::convertToDTO)
+                .collect(Collectors.toList());
+
     }
 
     @Override
@@ -183,7 +198,6 @@ public class PlayerServiceImpl implements PlayerService {
     private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
         String tokenEmail = jwtService.getEmailFromToken(token);
-        System.out.println("sdsd");
 
         PlayerEntity tokenPlayer = playerRepository.findByEmail(tokenEmail)
                 .orElseThrow(() -> new ServiceException("Player not found"));
