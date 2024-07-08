@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,11 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "e8jX2F1mA6z5vY2nF8s9xJ5lA7gD2pL4";
-    private static final long EXPIRATION_TIME_MS = 86_400_000;
+    @Value("${security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${security.jwt.expiration-time}")
+    private long expirationTime;
 
     @Autowired
     private InvalidTokenService invalidTokenService;
@@ -36,16 +40,15 @@ public class JwtService {
         return Jwts
                 .builder()
                 .claim("nickname", player.getUsername())
-                .claim("password", player.getPassword())
                 .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Key getKey() {
-        byte[] keyBytes = SECRET_KEY.getBytes();
+        byte[] keyBytes = secretKey.getBytes();
 
         return Keys.hmacShaKeyFor(keyBytes);
     }

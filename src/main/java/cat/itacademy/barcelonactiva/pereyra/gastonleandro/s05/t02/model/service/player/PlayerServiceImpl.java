@@ -100,7 +100,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         if (playerDTO.getNickName() != null) player.setNickName(playerDTO.getNickName());
 
-        if (playerDTO.getPassword() != null) player.setPassword(playerDTO.getPassword());
+        if (playerDTO.getPassword() != null) player.setPassword(passwordEncoder.encode(playerDTO.getPassword()));
 
         playerRepository.save(player);
 
