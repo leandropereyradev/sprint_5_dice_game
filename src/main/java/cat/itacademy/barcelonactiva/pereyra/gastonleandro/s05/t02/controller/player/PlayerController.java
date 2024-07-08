@@ -2,7 +2,6 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.pl
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.InvalidTokenService;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,9 +25,6 @@ public class PlayerController {
 
     @Autowired
     private PlayerService playerService;
-
-    @Autowired
-    private InvalidTokenService invalidTokenService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new player", description = "Register a new player with a nickname and password")
@@ -60,12 +56,10 @@ public class PlayerController {
             @ApiResponse(responseCode = "200", description = "Player logged out successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid token")
     })
-    public ResponseEntity<Void> logoutPlayer(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+    public ResponseEntity<String> logoutPlayer(HttpServletRequest request) {
+        playerService.logout(request);
 
-        invalidTokenService.invalidateToken(token);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Successfully logged out");
     }
 
     @PutMapping("/{id}")
@@ -75,8 +69,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "404", description = "Player not found"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO) {
-        PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO);
+    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO, HttpServletRequest request) {
+        PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO, request);
 
         return ResponseEntity.ok(updatedPlayer);
     }
@@ -101,8 +95,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "200", description = "Player retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Player not found")
     })
-    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
-        PlayerDTO playerDTO = playerService.getPlayerById(id);
+    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id, HttpServletRequest request) {
+        PlayerDTO playerDTO = playerService.getPlayerById(id, request);
 
         return ResponseEntity.ok(playerDTO);
     }

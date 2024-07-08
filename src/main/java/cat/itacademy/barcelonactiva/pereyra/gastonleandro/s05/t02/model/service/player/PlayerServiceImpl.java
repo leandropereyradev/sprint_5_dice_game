@@ -6,8 +6,10 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.p
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.InvalidTokenService;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +33,10 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Autowired
     private PlayerMapper playerMapper;
+
+    @Autowired
+    private InvalidTokenService invalidTokenService;
+
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -95,7 +101,16 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
+    public void logout(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+
+        invalidTokenService.invalidateToken(token);
+    }
+
+    @Override
+    public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO, HttpServletRequest request) {
+        verifyEmailMatch(id, request);
+
         PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
         if (playerDTO.getEmail() != null) player.setEmail(playerDTO.getEmail());
@@ -121,7 +136,9 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public PlayerDTO getPlayerById(Long id) {
+    public PlayerDTO getPlayerById(Long id, HttpServletRequest request) {
+        verifyEmailMatch(id, request);
+
         PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
         return playerMapper.convertToDTO(player);
@@ -161,5 +178,23 @@ public class PlayerServiceImpl implements PlayerService {
                 .map(playerMapper::convertToDTO)
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new ServiceException("No players found"));
+    }
+
+    private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String tokenEmail = jwtService.getEmailFromToken(token);
+        System.out.println("sdsd");
+
+        PlayerEntity tokenPlayer = playerRepository.findByEmail(tokenEmail)
+                .orElseThrow(() -> new ServiceException("Player not found"));
+
+        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
+            PlayerEntity player = playerRepository.findById(playerId)
+                    .orElseThrow(() -> new ServiceException("Player not found"));
+
+            if (!player.getEmail().equals(tokenEmail))
+                throw new ServiceException("Access denied: You are trying to access a user that does not correspond to your credential.");
+
+        }
     }
 }
