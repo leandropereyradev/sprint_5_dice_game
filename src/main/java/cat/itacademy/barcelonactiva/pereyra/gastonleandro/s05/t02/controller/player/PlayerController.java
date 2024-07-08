@@ -82,7 +82,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Delete a player", description = "Delete an existing player by ID")
+    @Operation(summary = "Delete a player", description = "Delete an existing player by ID - Only by ROLE ADMIN")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Player deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Player not found")
@@ -149,7 +149,7 @@ public class PlayerController {
     })
     public ResponseEntity<PlayerDTO> getPlayerWithHighestWinRate() {
         PlayerDTO playerWithHighestWinRate = playerService.getPlayerWithHighestWinRate();
-        
+
         return ResponseEntity.ok(playerWithHighestWinRate);
     }
 }
