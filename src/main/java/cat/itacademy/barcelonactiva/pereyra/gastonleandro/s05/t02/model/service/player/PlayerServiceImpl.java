@@ -57,7 +57,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional
-    public AuthResponse register(PlayerDTO playerDTO) {
+    public PlayerDTO register(PlayerDTO playerDTO) {
         if (playerRepository.findByEmail(playerDTO.getEmail()).isPresent())
             throw new ServiceException("'" + playerDTO.getEmail() + "' already exists");
 
@@ -72,9 +72,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         playerRepository.save(player);
 
-        return AuthResponse.builder()
-                .token(jwtService.getToken(player))
-                .build();
+        return playerMapper.convertToDTO(player);
     }
 
     @Override

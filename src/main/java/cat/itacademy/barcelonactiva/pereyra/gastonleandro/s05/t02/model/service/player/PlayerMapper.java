@@ -24,6 +24,7 @@ public class PlayerMapper {
         return PlayerDTO
                 .builder()
                 .id(player.getId())
+                .email(player.getEmail())
                 .nickName(player.getNickName())
                 .role(player.getRole())
                 .password(player.getPassword())

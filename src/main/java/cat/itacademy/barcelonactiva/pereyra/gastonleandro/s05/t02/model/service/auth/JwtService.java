@@ -38,7 +38,7 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .orElse("");
 
-        if (player instanceof PlayerEntity playerEntity) {
+        if (player instanceof PlayerEntity playerEntity)
             return Jwts
                     .builder()
                     .claim("email", player.getUsername())
@@ -48,9 +48,9 @@ public class JwtService {
                     .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                     .signWith(getKey(), SignatureAlgorithm.HS256)
                     .compact();
-        } else {
-            throw new IllegalArgumentException("UserDetails is not an instance of PlayerEntity");
-        }
+
+        else throw new IllegalArgumentException("UserDetails is not an instance of PlayerEntity");
+
     }
 
     private Key getKey() {
@@ -62,7 +62,8 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String email = getEmailFromToken(token);
 
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token) && !invalidTokenService.isTokenInvalid(token));
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token)
+                && !invalidTokenService.isTokenInvalid(token));
     }
 
     public String getEmailFromToken(String token) {
@@ -82,13 +83,6 @@ public class JwtService {
         final Claims claims = getAllClaims(token);
 
         return claimsResolver.apply(claims);
-    }
-
-    public String getExpiredToken() {
-        return Jwts.builder()
-                .setExpiration(new Date(0))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
-                .compact();
     }
 
     private Date getExpiration(String token) {

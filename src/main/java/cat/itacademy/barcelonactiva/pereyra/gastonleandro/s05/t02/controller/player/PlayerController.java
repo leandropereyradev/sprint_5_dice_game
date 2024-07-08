@@ -28,8 +28,8 @@ public class PlayerController {
     private InvalidTokenService invalidTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
-        AuthResponse authResponse = playerService.register(playerDTO);
+    public ResponseEntity<PlayerDTO> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
+        PlayerDTO authResponse = playerService.register(playerDTO);
 
         return ResponseEntity.ok(authResponse);
     }

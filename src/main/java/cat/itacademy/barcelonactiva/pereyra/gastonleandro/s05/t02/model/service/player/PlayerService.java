@@ -8,7 +8,7 @@ import java.util.List;
 public interface PlayerService {
     void createAdminUserIfNotExists();
 
-    AuthResponse register(PlayerDTO playerDTO);
+    PlayerDTO register(PlayerDTO playerDTO);
 
     AuthResponse login(PlayerDTO playerDTO);
 

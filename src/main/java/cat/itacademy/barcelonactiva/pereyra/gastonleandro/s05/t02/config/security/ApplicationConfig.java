@@ -38,7 +38,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailService() {
-        return nickname -> playerRepository.findByNickName(nickname)
+        return email -> playerRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Player not found"));
     }
 
