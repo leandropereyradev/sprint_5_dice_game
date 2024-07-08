@@ -2,6 +2,9 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.ga
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.game.GameDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game.GameService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,11 @@ public class GameController {
     private GameService gameService;
 
     @PostMapping
+    @Operation(summary = "Roll dices for a player", description = "Roll dices for a specific player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dices rolled successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found")
+    })
     public ResponseEntity<GameDTO> rollDices(@PathVariable Long id) {
         GameDTO rollDices = gameService.rollDices(id);
 
@@ -26,6 +34,11 @@ public class GameController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all rolls by player", description = "Retrieve all dice rolls for a specific player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rolls retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found")
+    })
     public ResponseEntity<List<GameDTO>> getRollsByPlayer(@PathVariable Long id) {
         List<GameDTO> rollsByPlayer = gameService.getRollsByPlayer(id);
 
@@ -33,6 +46,11 @@ public class GameController {
     }
 
     @DeleteMapping
+    @Operation(summary = "Delete all rolls by player", description = "Delete all dice rolls for a specific player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Rolls deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found")
+    })
     public ResponseEntity<Void> deleteRollsByPlayer(@PathVariable Long id) {
         boolean isDeleted = gameService.deleteRollsByPlayer(id);
 

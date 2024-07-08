@@ -4,6 +4,9 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.play
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.InvalidTokenService;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,11 @@ public class PlayerController {
     private InvalidTokenService invalidTokenService;
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new player", description = "Register a new player with a nickname and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
     public ResponseEntity<PlayerDTO> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         PlayerDTO authResponse = playerService.register(playerDTO);
 
@@ -35,6 +43,11 @@ public class PlayerController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login a player", description = "Authenticate a player with a nickname and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player logged in successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
     public ResponseEntity<AuthResponse> loginPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
         AuthResponse authResponse = playerService.login(playerDTO);
 
@@ -42,6 +55,11 @@ public class PlayerController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout a player", description = "Invalidate the current token for the logged-in player")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player logged out successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid token")
+    })
     public ResponseEntity<Void> logoutPlayer(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
 
@@ -51,6 +69,12 @@ public class PlayerController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update player details", description = "Update the details of an existing player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
     public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO) {
         PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO);
 
@@ -58,6 +82,11 @@ public class PlayerController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Delete a player", description = "Delete an existing player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Player deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found")
+    })
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         boolean isDeleted = playerService.deletePlayer(id);
 
@@ -67,6 +96,11 @@ public class PlayerController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get player details", description = "Retrieve the details of an existing player by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Player not found")
+    })
     public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
         PlayerDTO playerDTO = playerService.getPlayerById(id);
 
@@ -74,6 +108,10 @@ public class PlayerController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all players", description = "Retrieve a list of all players")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Players retrieved successfully")
+    })
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
         List<PlayerDTO> players = playerService.getAllPlayers();
 
@@ -81,6 +119,10 @@ public class PlayerController {
     }
 
     @GetMapping("/ranking")
+    @Operation(summary = "Get average win rate", description = "Retrieve the average win rate of all players")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Average win rate retrieved successfully")
+    })
     public ResponseEntity<Double> getAverageWinRate() {
         double averageWinRate = playerService.getAverageWinRate();
 
@@ -88,6 +130,11 @@ public class PlayerController {
     }
 
     @GetMapping("/ranking/loser")
+    @Operation(summary = "Get player with lowest win rate", description = "Retrieve the player with the lowest win rate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No players found")
+    })
     public ResponseEntity<PlayerDTO> getPlayerWithLowestWinRate() {
         PlayerDTO playerWithLowestWinRate = playerService.getPlayerWithLowestWinRate();
 
@@ -95,9 +142,14 @@ public class PlayerController {
     }
 
     @GetMapping("/ranking/winner")
+    @Operation(summary = "Get player with highest win rate", description = "Retrieve the player with the highest win rate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No players found")
+    })
     public ResponseEntity<PlayerDTO> getPlayerWithHighestWinRate() {
         PlayerDTO playerWithHighestWinRate = playerService.getPlayerWithHighestWinRate();
-
+        
         return ResponseEntity.ok(playerWithHighestWinRate);
     }
 }
