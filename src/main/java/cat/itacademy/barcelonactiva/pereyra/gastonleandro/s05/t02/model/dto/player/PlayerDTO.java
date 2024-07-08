@@ -17,7 +17,9 @@ import java.util.Date;
 public class PlayerDTO {
     private Long id;
 
-    @NotBlank(message = "Nickname is required")
+    @NotBlank(message = "Email is required")
+    private String email;
+
     @Size(min = 3, max = 20, message = "Nickname must be between 3 and 20 characters")
     private String nickName;
 

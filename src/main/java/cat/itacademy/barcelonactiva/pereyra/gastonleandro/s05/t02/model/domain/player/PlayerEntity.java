@@ -21,7 +21,7 @@ import java.util.List;
 @Table(name = "player", uniqueConstraints = {
         @UniqueConstraint(
                 columnNames = {
-                        "nickName"
+                        "email"
                 }
         )
 })
@@ -32,8 +32,11 @@ public class PlayerEntity implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
+    private String email;
+
     private String nickName;
 
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -43,12 +46,12 @@ public class PlayerEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(("ROLE_" + role.name())));
+        return List.of(new SimpleGrantedAuthority((role.name())));
     }
 
     @Override
     public String getUsername() {
-        return nickName;
+        return email;
     }
 
     @Override

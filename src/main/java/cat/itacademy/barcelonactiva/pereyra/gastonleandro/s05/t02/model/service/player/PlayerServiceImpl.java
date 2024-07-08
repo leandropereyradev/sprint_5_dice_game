@@ -44,9 +44,10 @@ public class PlayerServiceImpl implements PlayerService {
             PlayerEntity admin = PlayerEntity
                     .builder()
                     .id(1L)
+                    .email("admin@admin.com")
                     .nickName("admin")
                     .password(passwordEncoder.encode("admin"))
-                    .role(Role.ADMIN)
+                    .role(Role.ROLE_ADMIN)
                     .registrationDate(new Date())
                     .build();
 
@@ -57,14 +58,15 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     @Transactional
     public AuthResponse register(PlayerDTO playerDTO) {
-        if (playerRepository.findByNickName(playerDTO.getNickName()).isPresent())
-            throw new ServiceException("'" + playerDTO.getNickName() + "' already exists");
+        if (playerRepository.findByEmail(playerDTO.getEmail()).isPresent())
+            throw new ServiceException("'" + playerDTO.getEmail() + "' already exists");
 
         PlayerEntity player = PlayerEntity
                 .builder()
+                .email(playerDTO.getEmail())
                 .nickName(playerDTO.getNickName().isEmpty() ? "Anonymous" : playerDTO.getNickName())
                 .password(passwordEncoder.encode(playerDTO.getPassword()))
-                .role(Role.USER)
+                .role(Role.ROLE_USER)
                 .registrationDate(new Date())
                 .build();
 
@@ -79,12 +81,12 @@ public class PlayerServiceImpl implements PlayerService {
     public AuthResponse login(PlayerDTO playerDTO) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        playerDTO.getNickName(),
+                        playerDTO.getEmail(),
                         playerDTO.getPassword()
                 )
         );
 
-        UserDetails userDetails = playerRepository.findByNickName(playerDTO.getNickName())
+        UserDetails userDetails = playerRepository.findByEmail(playerDTO.getEmail())
                 .orElseThrow(() -> new ServiceException("User not found"));
 
         String token = jwtService.getToken(userDetails);
@@ -97,6 +99,8 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
         PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
+
+        if (playerDTO.getEmail() != null) player.setEmail(playerDTO.getEmail());
 
         if (playerDTO.getNickName() != null) player.setNickName(playerDTO.getNickName());
 

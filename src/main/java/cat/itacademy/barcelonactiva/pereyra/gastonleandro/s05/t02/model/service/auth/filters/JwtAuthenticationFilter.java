@@ -34,15 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        String nickName = null;
+        String username = null;
 
 
         if (StringUtils.hasText(token)) {
-            nickName = jwtService.getNickNameFromToken(token);
+            username = jwtService.getEmailFromToken(token);
         }
 
-        if (nickName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(nickName);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             String role = userDetails.getAuthorities().stream()
                     .findFirst()

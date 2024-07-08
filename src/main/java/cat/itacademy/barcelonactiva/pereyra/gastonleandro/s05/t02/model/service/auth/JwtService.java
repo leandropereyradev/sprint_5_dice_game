@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,14 +38,19 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .orElse("");
 
-        return Jwts
-                .builder()
-                .claim("nickname", player.getUsername())
-                .claim("role", role)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
-                .compact();
+        if (player instanceof PlayerEntity playerEntity) {
+            return Jwts
+                    .builder()
+                    .claim("email", player.getUsername())
+                    .claim("nickname", playerEntity.getNickName())
+                    .claim("role", role)
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                    .signWith(getKey(), SignatureAlgorithm.HS256)
+                    .compact();
+        } else {
+            throw new IllegalArgumentException("UserDetails is not an instance of PlayerEntity");
+        }
     }
 
     private Key getKey() {
@@ -54,13 +60,13 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String nickName = getNickNameFromToken(token);
+        final String email = getEmailFromToken(token);
 
-        return (nickName.equals(userDetails.getUsername()) && !isTokenExpired(token) && !invalidTokenService.isTokenInvalid(token));
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token) && !invalidTokenService.isTokenInvalid(token));
     }
 
-    public String getNickNameFromToken(String token) {
-        return getClaim(token, claims -> claims.get("nickname", String.class));
+    public String getEmailFromToken(String token) {
+        return getClaim(token, claims -> claims.get("email", String.class));
     }
 
     private Claims getAllClaims(String token) {
