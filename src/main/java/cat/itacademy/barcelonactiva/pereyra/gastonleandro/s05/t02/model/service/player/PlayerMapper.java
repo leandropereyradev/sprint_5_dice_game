@@ -27,7 +27,6 @@ public class PlayerMapper {
                 .email(player.getEmail())
                 .nickName(player.getNickName())
                 .role(player.getRole())
-                .password(player.getPassword())
                 .registrationDate(player.getRegistrationDate())
                 .winRate(winRate)
                 .build();

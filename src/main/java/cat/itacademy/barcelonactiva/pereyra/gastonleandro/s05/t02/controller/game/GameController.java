@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,11 +51,9 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Player not found")
     })
     public ResponseEntity<Void> deleteRollsByPlayer(@PathVariable Long id) {
-        boolean isDeleted = gameService.deleteRollsByPlayer(id);
+        boolean deleted = gameService.deleteRollsByPlayer(id);
 
-        if (!isDeleted) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        return ResponseEntity.noContent().build();
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }
 
