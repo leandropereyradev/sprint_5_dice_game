@@ -9,5 +9,4 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, Long> {
     Optional<PlayerEntity> findByNickName(String nickName);
 
     Optional<PlayerEntity> findByEmail(String email);
-
 }

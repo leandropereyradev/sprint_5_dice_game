@@ -114,6 +114,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <!-- Provides testing support including JUnit, Hamcrest, and Mockito -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Mockito Core -->
@@ -148,6 +154,35 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
+        </dependency>
+
+        <!-- AssertJ for fluent assertions -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Pact for contract testing -->
+        <dependency>
+            <groupId>au.com.dius.pact.consumer</groupId>
+            <artifactId>junit5</artifactId>
+            <version>4.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>au.com.dius.pact.provider</groupId>
+            <artifactId>junit5</artifactId>
+            <version>4.6.0</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
     <build>
