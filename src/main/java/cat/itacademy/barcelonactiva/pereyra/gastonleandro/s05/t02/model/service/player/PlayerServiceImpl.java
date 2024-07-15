@@ -28,11 +28,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlayerServiceImpl implements PlayerService {
 
-    @Autowired
     private final PlayerRepository playerRepository;
-
-    @Autowired
-    private PlayerMapper playerMapper;
+    private final PlayerMapper playerMapper;
 
     @Autowired
     private InvalidTokenService invalidTokenService;
@@ -76,9 +73,9 @@ public class PlayerServiceImpl implements PlayerService {
                 .registrationDate(new Date())
                 .build();
 
-        playerRepository.save(player);
+        PlayerEntity savedPlayer = playerRepository.save(player);
 
-        return playerMapper.convertToDTO(player);
+        return playerMapper.convertToDTO(savedPlayer);
     }
 
     @Override
@@ -145,18 +142,21 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public List<PlayerDTO> getAllPlayers(HttpServletRequest request) {
-        PlayerEntity tokenPlayer = getPlayerFromToken(request);
+        PlayerEntity tokenPlayer = null;
+        if (request != null) {
+            tokenPlayer = getPlayerFromToken(request);
+        }
 
-        if (tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
+        if (tokenPlayer != null && tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
             return playerRepository.findAll().stream()
                     .map(playerMapper::convertToDTO)
                     .collect(Collectors.toList());
-
-        else return playerRepository.findAll().stream()
-                .filter(player -> !player.getId().equals(1L))
-                .map(playerMapper::convertToDTO)
-                .collect(Collectors.toList());
-
+        } else {
+            return playerRepository.findAll().stream()
+                    .filter(player -> !player.getId().equals(1L))
+                    .map(playerMapper::convertToDTO)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

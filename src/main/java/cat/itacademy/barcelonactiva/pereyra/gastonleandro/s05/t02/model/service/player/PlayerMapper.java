@@ -5,16 +5,19 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.p
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+
+@Component
 public class PlayerMapper {
+
     @Autowired
     private GameRepository gameRepository;
 
-    PlayerDTO convertToDTO(PlayerEntity player) {
+    public PlayerDTO convertToDTO(PlayerEntity player) {
         List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
 
         long totalGames = games.size();
