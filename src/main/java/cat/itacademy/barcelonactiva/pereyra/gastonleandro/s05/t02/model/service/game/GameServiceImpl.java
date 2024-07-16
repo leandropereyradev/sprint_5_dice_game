@@ -1,7 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.GameMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
@@ -81,7 +81,7 @@ public class GameServiceImpl implements GameService {
 
         if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
             PlayerEntity player = playerRepository.findById(playerId)
-                    .orElseThrow(() -> new ServiceException("Player not found"));
+                    .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
             if (!player.getEmail().equals(tokenPlayer.getEmail()))
                 throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
@@ -98,6 +98,6 @@ public class GameServiceImpl implements GameService {
         String email = jwtService.getEmailFromToken(token);
 
         return playerRepository.findByEmail(email)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 }

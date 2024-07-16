@@ -1,7 +1,8 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.EmailAlreadyExistsException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.enums.Role;
@@ -58,7 +59,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Transactional
     public PlayerDTO register(PlayerEntity player) {
         if (playerRepository.findByEmail(player.getEmail()).isPresent())
-            throw new ServiceException("'" + player.getEmail() + "' already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
 
         PlayerEntity playerEntity = PlayerEntity
                 .builder()
@@ -84,7 +85,7 @@ public class PlayerServiceImpl implements PlayerService {
         );
 
         UserDetails userDetails = playerRepository.findByEmail(player.getEmail())
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         String token = jwtService.getToken(userDetails);
 
@@ -104,7 +105,7 @@ public class PlayerServiceImpl implements PlayerService {
         verifyEmailMatch(id, request);
 
         PlayerEntity playerEntity = playerRepository.findById(id)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         if (player.getEmail() != null) playerEntity.setEmail(player.getEmail());
 
@@ -126,17 +127,17 @@ public class PlayerServiceImpl implements PlayerService {
         String email = jwtService.getEmailFromToken(token);
 
         PlayerEntity tokenPlayer = playerRepository.findByEmail(email)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
             throw new AccessDeniedException("Access denied: You are not an admin.");
 
         boolean exists = playerRepository.existsById(id);
 
-        if (!exists) throw new ServiceException("Player not found");
+        if (!exists) throw new PlayerNotFoundException("Player not found");
 
         PlayerEntity playerEntity = playerRepository.findById(id)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         playerRepository.deleteById(id);
 
@@ -149,7 +150,7 @@ public class PlayerServiceImpl implements PlayerService {
         verifyEmailMatch(id, request);
 
         PlayerEntity player = playerRepository.findById(id)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         return playerMapper.convertToDTO(player);
     }
@@ -196,7 +197,7 @@ public class PlayerServiceImpl implements PlayerService {
                 .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
                 .min(Comparator.comparingDouble(PlayerDTO::getWinRate))
-                .orElseThrow(() -> new ServiceException("No players found"));
+                .orElseThrow(() -> new PlayerNotFoundException("No players found"));
     }
 
     @Override
@@ -207,7 +208,7 @@ public class PlayerServiceImpl implements PlayerService {
                 .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
-                .orElseThrow(() -> new ServiceException("No players found"));
+                .orElseThrow(() -> new PlayerNotFoundException("No players found"));
     }
 
 
@@ -216,7 +217,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
             PlayerEntity player = playerRepository.findById(playerId)
-                    .orElseThrow(() -> new ServiceException("Player not found"));
+                    .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
             if (!player.getEmail().equals(tokenPlayer.getEmail()))
                 throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
@@ -233,6 +234,6 @@ public class PlayerServiceImpl implements PlayerService {
         String email = jwtService.getEmailFromToken(token);
 
         return playerRepository.findByEmail(email)
-                .orElseThrow(() -> new ServiceException("Player not found"));
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 }
