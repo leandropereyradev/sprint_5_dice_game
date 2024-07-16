@@ -38,7 +38,6 @@ public class PlayerServiceImpl implements PlayerService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    @Override
     @PostConstruct
     public void createAdminUserIfNotExists() {
         boolean adminExists = playerRepository.findById(1L).isPresent();
@@ -60,34 +59,34 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional
-    public PlayerDTO register(PlayerDTO playerDTO) {
-        if (playerRepository.findByEmail(playerDTO.getEmail()).isPresent())
-            throw new ServiceException("'" + playerDTO.getEmail() + "' already exists");
+    public PlayerDTO register(PlayerEntity player) {
+        if (playerRepository.findByEmail(player.getEmail()).isPresent())
+            throw new ServiceException("'" + player.getEmail() + "' already exists");
 
-        PlayerEntity player = PlayerEntity
+        PlayerEntity playerEntity = PlayerEntity
                 .builder()
-                .email(playerDTO.getEmail())
-                .nickName(playerDTO.getNickName().isEmpty() ? "Anonymous" : playerDTO.getNickName())
-                .password(passwordEncoder.encode(playerDTO.getPassword()))
+                .email(player.getEmail())
+                .nickName(player.getNickName().isEmpty() ? "Anonymous" : player.getNickName())
+                .password(passwordEncoder.encode(player.getPassword()))
                 .role(Role.ROLE_USER)
                 .registrationDate(new Date())
                 .build();
 
-        PlayerEntity savedPlayer = playerRepository.save(player);
+        PlayerEntity savedPlayer = playerRepository.save(playerEntity);
 
         return playerMapper.convertToDTO(savedPlayer);
     }
 
     @Override
-    public AuthResponse login(PlayerDTO playerDTO) {
+    public AuthResponse login(PlayerEntity player) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        playerDTO.getEmail(),
-                        playerDTO.getPassword()
+                        player.getEmail(),
+                        player.getPassword()
                 )
         );
 
-        UserDetails userDetails = playerRepository.findByEmail(playerDTO.getEmail())
+        UserDetails userDetails = playerRepository.findByEmail(player.getEmail())
                 .orElseThrow(() -> new ServiceException("User not found"));
 
         String token = jwtService.getToken(userDetails);
@@ -104,20 +103,20 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO, HttpServletRequest request) {
+    public PlayerDTO updatePlayer(Long id, PlayerEntity player, HttpServletRequest request) {
         verifyEmailMatch(id, request);
 
-        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
+        PlayerEntity playerEntity = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
 
-        if (playerDTO.getEmail() != null) player.setEmail(playerDTO.getEmail());
+        if (player.getEmail() != null) playerEntity.setEmail(player.getEmail());
 
-        if (playerDTO.getNickName() != null) player.setNickName(playerDTO.getNickName());
+        if (player.getNickName() != null) playerEntity.setNickName(player.getNickName());
 
-        if (playerDTO.getPassword() != null) player.setPassword(passwordEncoder.encode(playerDTO.getPassword()));
+        if (player.getPassword() != null) playerEntity.setPassword(passwordEncoder.encode(player.getPassword()));
 
-        playerRepository.save(player);
+        playerRepository.save(playerEntity);
 
-        return playerMapper.convertToDTO(player);
+        return playerMapper.convertToDTO(playerEntity);
     }
 
     @Override
@@ -143,20 +142,19 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public List<PlayerDTO> getAllPlayers(HttpServletRequest request) {
         PlayerEntity tokenPlayer = null;
-        if (request != null) {
-            tokenPlayer = getPlayerFromToken(request);
-        }
 
-        if (tokenPlayer != null && tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
+        if (request != null) tokenPlayer = getPlayerFromToken(request);
+
+        if (tokenPlayer != null && tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
             return playerRepository.findAll().stream()
                     .map(playerMapper::convertToDTO)
                     .collect(Collectors.toList());
-        } else {
-            return playerRepository.findAll().stream()
+
+        else return playerRepository.findAll().stream()
                     .filter(player -> !player.getId().equals(1L))
                     .map(playerMapper::convertToDTO)
                     .collect(Collectors.toList());
-        }
+
     }
 
     @Override
@@ -164,10 +162,15 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         double totalWinRate = players.stream()
+                .filter(player -> player.getId() != 1L)
                 .mapToDouble(playerMapper::calculateWinRate)
                 .sum();
 
-        return players.isEmpty() ? 0 : totalWinRate / players.size();
+        long count = players.stream()
+                .filter(player -> player.getId() != 1L)
+                .count();
+
+        return count == 0 ? 0 : totalWinRate / count;
     }
 
     @Override
@@ -175,6 +178,7 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
+                .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
                 .min(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new ServiceException("No players found"));
@@ -185,10 +189,12 @@ public class PlayerServiceImpl implements PlayerService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
+                .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new ServiceException("No players found"));
     }
+
 
     private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
         PlayerEntity tokenPlayer = getPlayerFromToken(request);

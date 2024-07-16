@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.player;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
@@ -32,8 +33,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "200", description = "Player registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<PlayerDTO> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
-        PlayerDTO authResponse = playerService.register(playerDTO);
+    public ResponseEntity<PlayerDTO> registerPlayer(@Valid @RequestBody PlayerEntity player) {
+        PlayerDTO authResponse = playerService.register(player);
 
         return ResponseEntity.ok(authResponse);
     }
@@ -44,8 +45,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "200", description = "Player logged in successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
-    public ResponseEntity<AuthResponse> loginPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
-        AuthResponse authResponse = playerService.login(playerDTO);
+    public ResponseEntity<AuthResponse> loginPlayer(@Valid @RequestBody PlayerEntity player) {
+        AuthResponse authResponse = playerService.login(player);
 
         return ResponseEntity.ok(authResponse);
     }
@@ -69,8 +70,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "404", description = "Player not found"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerDTO playerDTO, HttpServletRequest request) {
-        PlayerDTO updatedPlayer = playerService.updatePlayer(id, playerDTO, request);
+    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @Valid @RequestBody PlayerEntity player, HttpServletRequest request) {
+        PlayerDTO updatedPlayer = playerService.updatePlayer(id, player, request);
 
         return ResponseEntity.ok(updatedPlayer);
     }

@@ -31,11 +31,6 @@ public class PlayerDTO {
     @Schema(description = "Nickname of the player", example = "Player1")
     private String nickName;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 30, message = "Password must be between 6 and 30 characters")
-    @Schema(description = "Password of the player", example = "password123", required = true)
-    private String password;
-
     @Schema(description = "Role of the player", example = "ROLE_USER")
     private Role role;
 
