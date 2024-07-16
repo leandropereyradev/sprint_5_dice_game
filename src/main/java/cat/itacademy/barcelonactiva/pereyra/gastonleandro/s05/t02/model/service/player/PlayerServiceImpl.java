@@ -2,7 +2,6 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.EmailAlreadyExistsException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.InvalidTokenException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
@@ -97,13 +96,13 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public void logout(HttpServletRequest request) {
-        String token = extractToken(request);
+        String token = jwtService.extractToken(request);
         jwtService.invalidateToken(token);
     }
 
     @Override
     public PlayerDTO updatePlayer(Long id, PlayerEntity player, HttpServletRequest request) {
-        verifyEmailMatch(id, request);
+        jwtService.verifyEmailMatch(id, request);
 
         PlayerEntity playerEntity = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
@@ -124,7 +123,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public PlayerDTO deletePlayer(Long id, HttpServletRequest request) {
 
-        String token = extractToken(request);
+        String token = jwtService.extractToken(request);
         String email = jwtService.getEmailFromToken(token);
 
         PlayerEntity tokenPlayer = playerRepository.findByEmail(email)
@@ -148,7 +147,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public PlayerDTO getPlayerById(Long id, HttpServletRequest request) {
-        verifyEmailMatch(id, request);
+        jwtService.verifyEmailMatch(id, request);
 
         PlayerEntity player = playerRepository.findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
@@ -160,7 +159,7 @@ public class PlayerServiceImpl implements PlayerService {
     public List<PlayerDTO> getAllPlayers(HttpServletRequest request) {
         PlayerEntity tokenPlayer = null;
 
-        if (request != null) tokenPlayer = getPlayerFromToken(request);
+        if (request != null) tokenPlayer = jwtService.getPlayerFromToken(request);
 
         if (tokenPlayer != null && tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
             return playerRepository.findAll().stream()
@@ -210,36 +209,5 @@ public class PlayerServiceImpl implements PlayerService {
                 .map(playerMapper::convertToDTO)
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new PlayerNotFoundException("No players found"));
-    }
-
-
-    private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
-        PlayerEntity tokenPlayer = getPlayerFromToken(request);
-
-        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
-            PlayerEntity player = playerRepository.findById(playerId)
-                    .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
-
-            if (!player.getEmail().equals(tokenPlayer.getEmail()))
-                throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
-
-        }
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
-            throw new InvalidTokenException("Missing or invalid Authorization header");
-
-        return authorizationHeader.substring(7);
-    }
-
-    private PlayerEntity getPlayerFromToken(HttpServletRequest request) {
-        String token = extractToken(request);
-        String email = jwtService.getEmailFromToken(token);
-
-        return playerRepository.findByEmail(email)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 }

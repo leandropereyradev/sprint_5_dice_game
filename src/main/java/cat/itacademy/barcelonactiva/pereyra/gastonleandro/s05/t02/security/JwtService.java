@@ -1,10 +1,17 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.enums.Role;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.InvalidTokenException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +28,9 @@ public class JwtService {
 
     @Value("${security.jwt.expiration-time}")
     private long expirationTime;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     private final Set<String> invalidTokens = new HashSet<>();
 
@@ -95,5 +105,34 @@ public class JwtService {
 
     public boolean isTokenInvalid(String token) {
         return invalidTokens.contains(token);
+    }
+
+    public void verifyEmailMatch(Long playerId, HttpServletRequest request) {
+        PlayerEntity tokenPlayer = getPlayerFromToken(request);
+
+        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
+            PlayerEntity player = playerRepository.findById(playerId)
+                    .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
+
+            if (!player.getEmail().equals(tokenPlayer.getEmail()))
+                throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
+        }
+    }
+
+    public String extractToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
+            throw new InvalidTokenException("Missing or invalid Authorization header");
+
+        return authorizationHeader.substring(7);
+    }
+
+    public PlayerEntity getPlayerFromToken(HttpServletRequest request) {
+        String token = extractToken(request);
+        String email = getEmailFromToken(token);
+
+        return playerRepository.findByEmail(email)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 }

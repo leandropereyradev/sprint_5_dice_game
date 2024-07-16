@@ -1,12 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
 
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.InvalidTokenException;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.GameMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.enums.Role;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.game.GameDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
@@ -37,7 +32,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameDTO rollDices(Long playerId, HttpServletRequest request) {
-        verifyEmailMatch(playerId, request);
+        jwtService.verifyEmailMatch(playerId, request);
 
         int dice1 = (int) (Math.random() * 6) + 1;
         int dice2 = (int) (Math.random() * 6) + 1;
@@ -60,7 +55,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<GameDTO> getRollsByPlayer(Long playerId, HttpServletRequest request) {
-        verifyEmailMatch(playerId, request);
+        jwtService.verifyEmailMatch(playerId, request);
 
         return gameRepository.findByPlayerId(playerId)
                 .stream()
@@ -70,40 +65,10 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public boolean deleteRollsByPlayer(Long playerId, HttpServletRequest request) {
-        verifyEmailMatch(playerId, request);
+        jwtService.verifyEmailMatch(playerId, request);
 
         Long deletedCount = gameRepository.deleteByPlayerId(playerId);
 
         return deletedCount > 0;
-    }
-
-    private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
-        PlayerEntity tokenPlayer = getPlayerFromToken(request);
-
-        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
-            PlayerEntity player = playerRepository.findById(playerId)
-                    .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
-
-            if (!player.getEmail().equals(tokenPlayer.getEmail()))
-                throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
-
-        }
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
-            throw new InvalidTokenException("Missing or invalid Authorization header");
-
-        return authorizationHeader.substring(7);
-    }
-
-    private PlayerEntity getPlayerFromToken(HttpServletRequest request) {
-        String token = extractToken(request);
-        String email = jwtService.getEmailFromToken(token);
-
-        return playerRepository.findByEmail(email)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
     }
 }
