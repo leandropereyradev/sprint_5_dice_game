@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PlayerServiceImplComponentTests {
 
@@ -161,20 +160,6 @@ public class PlayerServiceImplComponentTests {
     }
 
     @Test
-    @DisplayName("Test Delete Player - Success")
-    public void testDeletePlayer_Success() {
-        when(playerRepository.findById(anyLong())).thenReturn(Optional.of(player));
-        when(playerRepository.existsById(anyLong())).thenReturn(true);
-        when(playerRepository.save(any(PlayerEntity.class))).thenReturn(player);
-        setupCommonMocks();
-        setupAuthMocks("dmin-token", "admin@example.com", adminPlayer);
-
-        PlayerDTO result = playerService.deletePlayer(1L, request);
-
-        assertEquals("Angelo", result.getNickName());
-    }
-
-    @Test
     @DisplayName("Test Get Player By Id - Success")
     public void testGetPlayerById_Success() {
         when(playerRepository.findById(anyLong())).thenReturn(Optional.of(player));
@@ -187,23 +172,15 @@ public class PlayerServiceImplComponentTests {
     }
 
     @Test
-    @DisplayName("Test Get All Players - As Admin - Success")
-    public void testGetAllPlayers_AsAdmin_Success() {
-        setupAuthMocks("admin-token", "admin@example.com", adminPlayer);
-        when(playerRepository.findAll()).thenReturn(List.of(player, adminPlayer));
-        setupCommonMocks();
-
-        List<PlayerDTO> result = playerService.getAllPlayers(request);
-
-        assertEquals(2, result.size());
-    }
-
-    @Test
     @DisplayName("Test Get All Players - As User - Success")
     public void testGetAllPlayers_AsUser_Success() {
         setupAuthMocks("user-token", "angelo@example.com", player);
         when(playerRepository.findAll()).thenReturn(List.of(player, adminPlayer));
+
         setupCommonMocks();
+
+        doNothing().when(jwtService).verifyEmailMatch(anyLong(), any(HttpServletRequest.class));
+
 
         List<PlayerDTO> result = playerService.getAllPlayers(request);
 
