@@ -1,6 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.InvalidTokenException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.GameMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
@@ -90,7 +91,12 @@ public class GameServiceImpl implements GameService {
     }
 
     private String extractToken(HttpServletRequest request) {
-        return request.getHeader("Authorization").substring(7);
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
+            throw new InvalidTokenException("Missing or invalid Authorization header");
+
+        return authorizationHeader.substring(7);
     }
 
     private PlayerEntity getPlayerFromToken(HttpServletRequest request) {
