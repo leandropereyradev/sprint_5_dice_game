@@ -84,8 +84,7 @@ public class PlayerServiceImplComponentTests {
 
         playerDTO = createPlayerDTO(
                 "Angelo",
-                "angelo@example.com",
-                "password"
+                "angelo@example.com"
         );
     }
 
@@ -99,11 +98,10 @@ public class PlayerServiceImplComponentTests {
                 .build();
     }
 
-    private PlayerDTO createPlayerDTO(String nickName, String email, String password) {
+    private PlayerDTO createPlayerDTO(String nickName, String email) {
         return PlayerDTO.builder()
                 .nickName(nickName)
                 .email(email)
-                .password(password)
                 .build();
     }
 
@@ -125,7 +123,7 @@ public class PlayerServiceImplComponentTests {
         when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
         setupCommonMocks();
 
-        PlayerDTO result = playerService.register(playerDTO);
+        PlayerDTO result = playerService.register(player);
 
         assertEquals("Angelo", result.getNickName());
     }
@@ -141,7 +139,7 @@ public class PlayerServiceImplComponentTests {
         when(userDetails.getUsername()).thenReturn("angelo@example.com");
         when(jwtService.getToken(any(UserDetails.class))).thenReturn("authToken");
 
-        AuthResponse result = playerService.login(playerDTO);
+        AuthResponse result = playerService.login(player);
 
         assertTrue(result.getToken() != null && !result.getToken().isEmpty());
         assertEquals("authToken", result.getToken());
@@ -157,7 +155,7 @@ public class PlayerServiceImplComponentTests {
 
         setupAuthMocks("authToken", "angelo@example.com", player);
 
-        PlayerDTO result = playerService.updatePlayer(1L, playerDTO, request);
+        PlayerDTO result = playerService.updatePlayer(1L, player, request);
 
         assertEquals("Angelo", result.getNickName());
     }

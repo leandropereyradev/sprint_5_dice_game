@@ -1,6 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controllers;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.player.PlayerController;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
@@ -35,6 +36,7 @@ class PlayerControllerTests {
     private Authentication authentication;
 
     private PlayerDTO playerDTO;
+    private PlayerEntity player;
     private AuthResponse authResponse;
 
     @BeforeEach
@@ -42,10 +44,15 @@ class PlayerControllerTests {
         MockitoAnnotations.openMocks(this);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        playerDTO = PlayerDTO.builder()
+        player = PlayerEntity.builder()
                 .nickName("Angelo")
                 .email("angelo@test.com")
                 .password("password")
+                .build();
+
+        playerDTO = PlayerDTO.builder()
+                .nickName("Angelo")
+                .email("angelo@test.com")
                 .build();
 
         authResponse = new AuthResponse("secretToken");
@@ -54,9 +61,9 @@ class PlayerControllerTests {
     @Test
     @DisplayName("Test Register Player - Success")
     public void testRegisterPlayer_Success() {
-        when(playerService.register(any(PlayerDTO.class))).thenReturn(playerDTO);
+        when(playerService.register(any(PlayerEntity.class))).thenReturn(playerDTO);
 
-        ResponseEntity<PlayerDTO> response = playerController.registerPlayer(playerDTO);
+        ResponseEntity<PlayerDTO> response = playerController.registerPlayer(player);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Angelo", response.getBody().getNickName());
@@ -65,9 +72,9 @@ class PlayerControllerTests {
     @Test
     @DisplayName("Test Login Player - Success")
     public void testLoginPlayer_Success() {
-        when(playerService.login(any(PlayerDTO.class))).thenReturn(authResponse);
+        when(playerService.login(any(PlayerEntity.class))).thenReturn(authResponse);
 
-        ResponseEntity<AuthResponse> response = playerController.loginPlayer(playerDTO);
+        ResponseEntity<AuthResponse> response = playerController.loginPlayer(player);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("secretToken", response.getBody().getToken());
@@ -88,10 +95,10 @@ class PlayerControllerTests {
     @Test
     @DisplayName("Test Update Player - Success")
     public void testUpdatePlayer_Success() {
-        when(playerService.updatePlayer(anyLong(), any(PlayerDTO.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
+        when(playerService.updatePlayer(anyLong(), any(PlayerEntity.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        ResponseEntity<PlayerDTO> response = playerController.updatePlayer(1L, playerDTO, request);
+        ResponseEntity<PlayerDTO> response = playerController.updatePlayer(1L, player, request);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Angelo", response.getBody().getNickName());
