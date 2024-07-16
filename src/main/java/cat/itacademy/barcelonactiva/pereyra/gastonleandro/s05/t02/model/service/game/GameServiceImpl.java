@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.GameMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
@@ -83,7 +84,7 @@ public class GameServiceImpl implements GameService {
                     .orElseThrow(() -> new ServiceException("Player not found"));
 
             if (!player.getEmail().equals(tokenPlayer.getEmail()))
-                throw new ServiceException("Access denied: You are trying to access a user that does not correspond to your credential.");
+                throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
 
         }
     }

@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
@@ -83,7 +84,7 @@ public class PlayerServiceImpl implements PlayerService {
         );
 
         UserDetails userDetails = playerRepository.findByEmail(player.getEmail())
-                .orElseThrow(() -> new ServiceException("User not found"));
+                .orElseThrow(() -> new ServiceException("Player not found"));
 
         String token = jwtService.getToken(userDetails);
 
@@ -102,13 +103,16 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDTO updatePlayer(Long id, PlayerEntity player, HttpServletRequest request) {
         verifyEmailMatch(id, request);
 
-        PlayerEntity playerEntity = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
+        PlayerEntity playerEntity = playerRepository.findById(id)
+                .orElseThrow(() -> new ServiceException("Player not found"));
 
         if (player.getEmail() != null) playerEntity.setEmail(player.getEmail());
 
         if (player.getNickName() != null) playerEntity.setNickName(player.getNickName());
 
-        if (player.getPassword() != null) playerEntity.setPassword(passwordEncoder.encode(player.getPassword()));
+        if (player.getPassword() != null) playerEntity.setPassword(
+                passwordEncoder.encode(player.getPassword())
+        );
 
         playerRepository.save(playerEntity);
 
@@ -125,7 +129,7 @@ public class PlayerServiceImpl implements PlayerService {
                 .orElseThrow(() -> new ServiceException("Player not found"));
 
         if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
-            throw new ServiceException("Access denied: You are not an admin.");
+            throw new AccessDeniedException("Access denied: You are not an admin.");
 
         boolean exists = playerRepository.existsById(id);
 
@@ -144,7 +148,8 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDTO getPlayerById(Long id, HttpServletRequest request) {
         verifyEmailMatch(id, request);
 
-        PlayerEntity player = playerRepository.findById(id).orElseThrow(() -> new ServiceException("Player not found"));
+        PlayerEntity player = playerRepository.findById(id)
+                .orElseThrow(() -> new ServiceException("Player not found"));
 
         return playerMapper.convertToDTO(player);
     }
@@ -214,7 +219,7 @@ public class PlayerServiceImpl implements PlayerService {
                     .orElseThrow(() -> new ServiceException("Player not found"));
 
             if (!player.getEmail().equals(tokenPlayer.getEmail()))
-                throw new ServiceException("Access denied: You are trying to access a user that does not correspond to your credential.");
+                throw new AccessDeniedException("Access denied: You are trying to access a user that does not correspond to your credential.");
 
         }
     }
