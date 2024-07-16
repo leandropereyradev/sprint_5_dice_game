@@ -1,7 +1,7 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.service;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.Role;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.enums.Role;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;

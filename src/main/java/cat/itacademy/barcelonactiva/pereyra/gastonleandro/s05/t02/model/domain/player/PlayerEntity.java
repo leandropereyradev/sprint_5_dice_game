@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
