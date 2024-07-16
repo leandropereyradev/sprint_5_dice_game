@@ -4,9 +4,9 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.p
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.Role;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerMapper;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security.JwtService;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -169,9 +169,9 @@ public class PlayerServiceImplComponentTests {
         setupCommonMocks();
         setupAuthMocks("dmin-token", "admin@example.com", adminPlayer);
 
-        boolean result = playerService.deletePlayer(1L, request);
+        PlayerDTO result = playerService.deletePlayer(1L, request);
 
-        assertEquals(true, result);
+        assertEquals("Angelo", result.getNickName());
     }
 
     @Test

@@ -1,20 +1,17 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -25,8 +22,7 @@ public class JwtService {
     @Value("${security.jwt.expiration-time}")
     private long expirationTime;
 
-    @Autowired
-    private InvalidTokenService invalidTokenService;
+    private final Set<String> invalidTokens = new HashSet<>();
 
     public String getToken(UserDetails player) {
         return getToken(new HashMap<>(), player);
@@ -63,7 +59,7 @@ public class JwtService {
         final String email = getEmailFromToken(token);
 
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token)
-                && !invalidTokenService.isTokenInvalid(token));
+                && !isTokenInvalid(token));
     }
 
     public String getEmailFromToken(String token) {
@@ -91,5 +87,13 @@ public class JwtService {
 
     private boolean isTokenExpired(String token) {
         return getExpiration(token).before(new Date());
+    }
+
+    public void invalidateToken(String token) {
+        invalidTokens.add(token);
+    }
+
+    public boolean isTokenInvalid(String token) {
+        return invalidTokens.contains(token);
     }
 }

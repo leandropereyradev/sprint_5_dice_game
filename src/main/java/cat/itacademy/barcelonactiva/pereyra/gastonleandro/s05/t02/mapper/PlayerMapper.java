@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
@@ -6,10 +6,8 @@ import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.play
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 
 @Component
 public class PlayerMapper {
@@ -35,7 +33,7 @@ public class PlayerMapper {
                 .build();
     }
 
-    double calculateWinRate(PlayerEntity player) {
+    public double calculateWinRate(PlayerEntity player) {
         List<GameEntity> games = gameRepository.findByPlayerId(player.getId());
 
         long totalGames = games.size();

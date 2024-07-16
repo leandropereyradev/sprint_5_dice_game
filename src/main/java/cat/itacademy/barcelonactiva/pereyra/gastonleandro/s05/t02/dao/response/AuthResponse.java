@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

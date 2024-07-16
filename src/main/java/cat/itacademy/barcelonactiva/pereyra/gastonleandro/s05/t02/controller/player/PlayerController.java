@@ -2,7 +2,7 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.pl
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -82,12 +82,10 @@ public class PlayerController {
             @ApiResponse(responseCode = "204", description = "Player deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Player not found")
     })
-    public ResponseEntity<Void> deletePlayer(@PathVariable Long id, HttpServletRequest request) {
-        boolean isDeleted = playerService.deletePlayer(id, request);
+    public ResponseEntity<PlayerDTO> deletePlayer(@PathVariable Long id, HttpServletRequest request) {
+        PlayerDTO playerDeleted = playerService.deletePlayer(id, request);
 
-        if (!isDeleted) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(playerDeleted);
     }
 
     @GetMapping("/{id}")

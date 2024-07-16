@@ -1,17 +1,16 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.Role;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.InvalidTokenService;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security.JwtService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,9 +29,6 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepository;
     private final PlayerMapper playerMapper;
-
-    @Autowired
-    private InvalidTokenService invalidTokenService;
 
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
@@ -99,7 +95,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void logout(HttpServletRequest request) {
         String token = extractToken(request);
-        invalidTokenService.invalidateToken(token);
+        jwtService.invalidateToken(token);
     }
 
     @Override
@@ -120,24 +116,27 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public boolean deletePlayer(Long id, HttpServletRequest request) {
+    public PlayerDTO deletePlayer(Long id, HttpServletRequest request) {
 
-            String token = extractToken(request);
-            String email = jwtService.getEmailFromToken(token);
+        String token = extractToken(request);
+        String email = jwtService.getEmailFromToken(token);
 
-            PlayerEntity tokenPlayer = playerRepository.findByEmail(email)
-                    .orElseThrow(() -> new ServiceException("Player not found"));
+        PlayerEntity tokenPlayer = playerRepository.findByEmail(email)
+                .orElseThrow(() -> new ServiceException("Player not found"));
 
-            if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
-                throw new ServiceException("Access denied: You are not an admin.");
+        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
+            throw new ServiceException("Access denied: You are not an admin.");
 
-            boolean exists = playerRepository.existsById(id);
+        boolean exists = playerRepository.existsById(id);
 
-            if (exists) {
-                playerRepository.deleteById(id);
-                return true;
+        if (!exists) throw new ServiceException("Player not found");
 
-            } else throw new ServiceException("Player not found");
+        PlayerEntity playerEntity = playerRepository.findById(id)
+                .orElseThrow(() -> new ServiceException("Player not found"));
+
+        playerRepository.deleteById(id);
+
+        return playerMapper.convertToDTO(playerEntity);
 
     }
 
@@ -162,9 +161,9 @@ public class PlayerServiceImpl implements PlayerService {
                     .collect(Collectors.toList());
 
         else return playerRepository.findAll().stream()
-                    .filter(player -> !player.getId().equals(1L))
-                    .map(playerMapper::convertToDTO)
-                    .collect(Collectors.toList());
+                .filter(player -> !player.getId().equals(1L))
+                .map(playerMapper::convertToDTO)
+                .collect(Collectors.toList());
 
     }
 

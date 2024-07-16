@@ -1,4 +1,4 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.game.GameDTO;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameMapper {
 
-    GameDTO convertToDTO(GameEntity gameEntity) {
+    public GameDTO convertToDTO(GameEntity gameEntity) {
 
         return GameDTO
                 .builder()

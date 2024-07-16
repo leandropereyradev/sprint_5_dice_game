@@ -1,6 +1,6 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.config.security;
 
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.filters.JwtAuthenticationFilter;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

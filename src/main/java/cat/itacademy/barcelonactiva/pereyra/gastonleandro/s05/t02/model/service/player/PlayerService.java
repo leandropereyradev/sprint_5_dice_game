@@ -2,7 +2,7 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface PlayerService {
 
     PlayerDTO updatePlayer(Long id, PlayerEntity player, HttpServletRequest request);
 
-    boolean deletePlayer(Long id, HttpServletRequest request);
+    PlayerDTO deletePlayer(Long id, HttpServletRequest request);
 
     PlayerDTO getPlayerById(Long id, HttpServletRequest request);
 

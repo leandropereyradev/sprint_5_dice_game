@@ -1,6 +1,5 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.filters;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.security;
 
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

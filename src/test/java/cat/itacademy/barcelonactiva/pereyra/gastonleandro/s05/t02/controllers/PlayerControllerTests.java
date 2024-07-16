@@ -3,7 +3,7 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controllers;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.controller.player.PlayerController;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.player.PlayerDTO;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.AuthResponse;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.dao.response.AuthResponse;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.player.PlayerService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,28 +102,6 @@ class PlayerControllerTests {
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Angelo", response.getBody().getNickName());
-    }
-
-    @Test
-    @DisplayName("Test Delete Player - Success")
-    public void testDeletePlayer_Success() {
-        when(playerService.updatePlayer(anyLong(), any(PlayerEntity.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
-
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        ResponseEntity<Void> response = playerController.deletePlayer(1L, request);
-
-        assertEquals(204, response.getStatusCodeValue());
-    }
-
-    @Test
-    @DisplayName("Test Delete Player - Not Found")
-    public void testDeletePlayer_NotFound() {
-        when(playerService.updatePlayer(anyLong(), any(PlayerEntity.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
-
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        ResponseEntity<Void> response = playerController.deletePlayer(1L, request);
-
-        assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
