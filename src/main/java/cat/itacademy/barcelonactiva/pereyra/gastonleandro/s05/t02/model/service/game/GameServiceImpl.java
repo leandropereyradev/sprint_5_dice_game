@@ -1,8 +1,14 @@
 package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.game;
 
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.ServiceException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.game.GameEntity;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.Role;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.dto.game.GameDTO;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.game.GameRepository;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.repository.player.PlayerRepository;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service.auth.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +25,17 @@ public class GameServiceImpl implements GameService {
     private GameRepository gameRepository;
 
     @Autowired
+    private final PlayerRepository playerRepository;
+
+    @Autowired
     private GameMapper gameMapper;
 
+    private final JwtService jwtService;
+
     @Override
-    public GameDTO rollDices(Long playerId) {
+    public GameDTO rollDices(Long playerId, HttpServletRequest request) {
+        verifyEmailMatch(playerId, request);
+
         int dice1 = (int) (Math.random() * 6) + 1;
         int dice2 = (int) (Math.random() * 6) + 1;
         int result = dice1 + dice2;
@@ -43,7 +56,9 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameDTO> getRollsByPlayer(Long playerId) {
+    public List<GameDTO> getRollsByPlayer(Long playerId, HttpServletRequest request) {
+        verifyEmailMatch(playerId, request);
+
         return gameRepository.findByPlayerId(playerId)
                 .stream()
                 .map(gameMapper::convertToDTO)
@@ -51,9 +66,36 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean deleteRollsByPlayer(Long playerId) {
+    public boolean deleteRollsByPlayer(Long playerId, HttpServletRequest request) {
+        verifyEmailMatch(playerId, request);
+
         Long deletedCount = gameRepository.deleteByPlayerId(playerId);
 
         return deletedCount > 0;
+    }
+
+    private void verifyEmailMatch(Long playerId, HttpServletRequest request) {
+        PlayerEntity tokenPlayer = getPlayerFromToken(request);
+
+        if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN)) {
+            PlayerEntity player = playerRepository.findById(playerId)
+                    .orElseThrow(() -> new ServiceException("Player not found"));
+
+            if (!player.getEmail().equals(tokenPlayer.getEmail()))
+                throw new ServiceException("Access denied: You are trying to access a user that does not correspond to your credential.");
+
+        }
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        return request.getHeader("Authorization").substring(7);
+    }
+
+    private PlayerEntity getPlayerFromToken(HttpServletRequest request) {
+        String token = extractToken(request);
+        String email = jwtService.getEmailFromToken(token);
+
+        return playerRepository.findByEmail(email)
+                .orElseThrow(() -> new ServiceException("Player not found"));
     }
 }

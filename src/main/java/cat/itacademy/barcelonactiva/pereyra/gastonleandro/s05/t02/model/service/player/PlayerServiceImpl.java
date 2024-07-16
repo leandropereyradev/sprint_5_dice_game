@@ -120,14 +120,25 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public boolean deletePlayer(Long id) {
-        boolean exists = playerRepository.existsById(id);
+    public boolean deletePlayer(Long id, HttpServletRequest request) {
 
-        if (exists) {
-            playerRepository.deleteById(id);
-            return true;
+            String token = extractToken(request);
+            String email = jwtService.getEmailFromToken(token);
 
-        } else throw new ServiceException("Player not found");
+            PlayerEntity tokenPlayer = playerRepository.findByEmail(email)
+                    .orElseThrow(() -> new ServiceException("Player not found"));
+
+            if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
+                throw new ServiceException("Access denied: You are not an admin.");
+
+            boolean exists = playerRepository.existsById(id);
+
+            if (exists) {
+                playerRepository.deleteById(id);
+                return true;
+
+            } else throw new ServiceException("Player not found");
+
     }
 
     @Override

@@ -17,7 +17,7 @@ public interface PlayerService {
 
     PlayerDTO updatePlayer(Long id, PlayerEntity player, HttpServletRequest request);
 
-    boolean deletePlayer(Long id);
+    boolean deletePlayer(Long id, HttpServletRequest request);
 
     PlayerDTO getPlayerById(Long id, HttpServletRequest request);
 

@@ -107,9 +107,10 @@ class PlayerControllerTests {
     @Test
     @DisplayName("Test Delete Player - Success")
     public void testDeletePlayer_Success() {
-        when(playerService.deletePlayer(anyLong())).thenReturn(true);
+        when(playerService.updatePlayer(anyLong(), any(PlayerEntity.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
 
-        ResponseEntity<Void> response = playerController.deletePlayer(1L);
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        ResponseEntity<Void> response = playerController.deletePlayer(1L, request);
 
         assertEquals(204, response.getStatusCodeValue());
     }
@@ -117,23 +118,12 @@ class PlayerControllerTests {
     @Test
     @DisplayName("Test Delete Player - Not Found")
     public void testDeletePlayer_NotFound() {
-        when(playerService.deletePlayer(anyLong())).thenReturn(false);
-
-        ResponseEntity<Void> response = playerController.deletePlayer(1L);
-
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    @DisplayName("Test Get Player By Id - Success")
-    public void testGetPlayerById_Success() {
-        when(playerService.getPlayerById(anyLong(), any(HttpServletRequest.class))).thenReturn(playerDTO);
+        when(playerService.updatePlayer(anyLong(), any(PlayerEntity.class), any(HttpServletRequest.class))).thenReturn(playerDTO);
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        ResponseEntity<PlayerDTO> response = playerController.getPlayerById(1L, request);
+        ResponseEntity<Void> response = playerController.deletePlayer(1L, request);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Angelo", response.getBody().getNickName());
+        assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test

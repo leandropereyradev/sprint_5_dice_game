@@ -165,8 +165,11 @@ public class PlayerServiceImplComponentTests {
     public void testDeletePlayer_Success() {
         when(playerRepository.findById(anyLong())).thenReturn(Optional.of(player));
         when(playerRepository.existsById(anyLong())).thenReturn(true);
+        when(playerRepository.save(any(PlayerEntity.class))).thenReturn(player);
+        setupCommonMocks();
+        setupAuthMocks("dmin-token", "admin@example.com", adminPlayer);
 
-        boolean result = playerService.deletePlayer(1L);
+        boolean result = playerService.deletePlayer(1L, request);
 
         assertEquals(true, result);
     }

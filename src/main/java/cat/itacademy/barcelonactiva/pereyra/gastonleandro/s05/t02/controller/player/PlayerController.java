@@ -82,8 +82,8 @@ public class PlayerController {
             @ApiResponse(responseCode = "204", description = "Player deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Player not found")
     })
-    public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
-        boolean isDeleted = playerService.deletePlayer(id);
+    public ResponseEntity<Void> deletePlayer(@PathVariable Long id, HttpServletRequest request) {
+        boolean isDeleted = playerService.deletePlayer(id, request);
 
         if (!isDeleted) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
