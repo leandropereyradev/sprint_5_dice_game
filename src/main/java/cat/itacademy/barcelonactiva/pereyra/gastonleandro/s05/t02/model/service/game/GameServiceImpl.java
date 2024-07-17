@@ -64,11 +64,9 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean deleteRollsByPlayer(Long playerId, HttpServletRequest request) {
+    public void deleteRollsByPlayer(Long playerId, HttpServletRequest request) {
         jwtService.verifyEmailMatch(playerId, request);
 
-        Long deletedCount = gameRepository.deleteByPlayerId(playerId);
-
-        return deletedCount > 0;
+        gameRepository.deleteByPlayerId(playerId);
     }
 }

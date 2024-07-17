@@ -130,7 +130,7 @@ public class PlayerServiceImpl implements PlayerService {
                 .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
         if (!tokenPlayer.getRole().equals(Role.ROLE_ADMIN))
-            throw new AccessDeniedException("Access denied: You are not an admin.");
+            throw new AccessDeniedException("Access denied: You do not have authorization to carry out this operation.");
 
         boolean exists = playerRepository.existsById(id);
 

@@ -10,6 +10,6 @@ public interface GameService {
 
     List<GameDTO> getRollsByPlayer(Long playerId, HttpServletRequest request);
 
-    boolean deleteRollsByPlayer(Long playerId, HttpServletRequest request);
+    void deleteRollsByPlayer(Long playerId, HttpServletRequest request);
 }
 

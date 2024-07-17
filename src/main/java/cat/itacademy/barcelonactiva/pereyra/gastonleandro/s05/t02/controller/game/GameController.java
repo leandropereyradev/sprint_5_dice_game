@@ -52,9 +52,9 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Player not found")
     })
     public ResponseEntity<Void> deleteRollsByPlayer(@PathVariable Long id, HttpServletRequest request) {
-        boolean deleted = gameService.deleteRollsByPlayer(id, request);
+        gameService.deleteRollsByPlayer(id, request);
 
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }
 
