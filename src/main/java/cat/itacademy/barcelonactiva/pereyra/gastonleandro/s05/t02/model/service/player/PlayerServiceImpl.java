@@ -2,6 +2,7 @@ package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.service
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.AccessDeniedException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.EmailAlreadyExistsException;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.NoPlayersWithWinRateException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.exception.PlayerNotFoundException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.mapper.PlayerMapper;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t02.model.domain.player.PlayerEntity;
@@ -193,9 +194,18 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDTO getPlayerWithLowestWinRate() {
         List<PlayerEntity> players = playerRepository.findAll();
 
-        return players.stream()
+        List<PlayerDTO> playerDTOs = players.stream()
                 .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
+                .toList();
+
+        boolean hasPlayerWithPositiveWinRate = playerDTOs.stream()
+                .anyMatch(playerDTO -> playerDTO.getWinRate() > 0);
+
+        if (!hasPlayerWithPositiveWinRate)
+            throw new NoPlayersWithWinRateException("No players with a positive win rate found");
+
+        return playerDTOs.stream()
                 .min(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new PlayerNotFoundException("No players found"));
     }
@@ -204,10 +214,21 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDTO getPlayerWithHighestWinRate() {
         List<PlayerEntity> players = playerRepository.findAll();
 
-        return players.stream()
+        List<PlayerDTO> playerDTOs = players.stream()
                 .filter(player -> player.getId() != 1L)
                 .map(playerMapper::convertToDTO)
+                .toList();
+
+        boolean hasPlayerWithPositiveWinRate = playerDTOs.stream()
+                .anyMatch(playerDTO -> playerDTO.getWinRate() > 0);
+
+        if (!hasPlayerWithPositiveWinRate)
+            throw new NoPlayersWithWinRateException("No players with a positive win rate found");
+
+        return playerDTOs.stream()
                 .max(Comparator.comparingDouble(PlayerDTO::getWinRate))
                 .orElseThrow(() -> new PlayerNotFoundException("No players found"));
     }
+
+
 }
