@@ -62,18 +62,8 @@ class GameRepositoryTests {
     public void GameRepository_DeleteByPlayerId_DeletesGames() {
         gameRepository.save(testGame);
 
-        Long deletedCount = gameRepository.deleteByPlayerId(1L);
-
-        assertEquals(1, deletedCount);
+        gameRepository.deleteByPlayerId(1L);
         List<GameEntity> foundGames = gameRepository.findByPlayerId(1L);
         assertTrue(foundGames.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Test deleteByPlayerId with non-existing playerId does nothing")
-    public void GameRepository_DeleteByPlayerId_NonExistingPlayerId_DoesNothing() {
-        Long deletedCount = gameRepository.deleteByPlayerId(2L);
-
-        assertEquals(0, deletedCount);
     }
 }

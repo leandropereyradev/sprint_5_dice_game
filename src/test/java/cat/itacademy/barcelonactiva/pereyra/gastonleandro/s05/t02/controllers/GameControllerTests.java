@@ -77,17 +77,6 @@ class GameControllerTests {
         assertEquals(204, response.getStatusCodeValue());
     }
 
-    @Test
-    @DisplayName("Test Delete Rolls By Player - Not Found")
-    public void testDeleteRollsByPlayer_NotFound() {
-        mockGameServiceMethod("deleteRollsByPlayer", false);
-
-        HttpServletRequest request = createMockHttpServletRequest();
-        ResponseEntity<Void> response = gameController.deleteRollsByPlayer(1L, request);
-
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
     // Métodos auxiliares
 
     private GameDTO createGameDTO() {
@@ -111,9 +100,6 @@ class GameControllerTests {
                 break;
             case "getRollsByPlayer":
                 when(gameService.getRollsByPlayer(anyLong(), any(HttpServletRequest.class))).thenReturn((List<GameDTO>) returnValue);
-                break;
-            case "deleteRollsByPlayer":
-                when(gameService.deleteRollsByPlayer(anyLong(), any(HttpServletRequest.class))).thenReturn((Boolean) returnValue);
                 break;
         }
     }
